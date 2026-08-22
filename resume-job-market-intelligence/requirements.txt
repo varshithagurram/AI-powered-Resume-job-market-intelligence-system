@@ -1,0 +1,29 @@
+# Scraping
+requests
+beautifulsoup4
+selenium
+
+# Data handling
+pandas
+numpy
+
+# Resume parsing
+pdfplumber
+python-docx
+docx2txt
+
+# NLP / matching
+spacy
+sentence-transformers
+scikit-learn
+
+# Database
+sqlalchemy
+psycopg2-binary   # PostgreSQL driver (remove if using SQLite only)
+
+# App
+streamlit
+
+# Utilities
+python-dotenv
+tqdm
