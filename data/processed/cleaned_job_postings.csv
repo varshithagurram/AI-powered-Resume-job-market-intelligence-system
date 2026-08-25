@@ -1,0 +1,6 @@
+title,company,location,experience,job_url,search_role,source,scraped_date,skills_str
+Data Analyst,Acme Analytics,Bengaluru,0-2 years,https://example.com/jobs/1,data analyst,sample,2026-08-23,"Excel, Python, SQL, Statistics, Tableau"
+Business Intelligence Analyst,BrightMetrics,Hyderabad,1-3 years,https://example.com/jobs/2,data analyst,sample,2026-08-23,"DAX, Excel, Power BI, SQL"
+Data Analyst,Northwind Retail,Remote,0-1 years,https://example.com/jobs/3,data analyst,sample,2026-08-23,"A/B Testing, Power BI, Python, SQL"
+Business Analyst,Vertex Solutions,Pune,2-4 years,https://example.com/jobs/4,business analyst,sample,2026-08-23,"Communication, Excel, Power BI, SQL, Statistics"
+Data Scientist,Quantico Labs,Bengaluru,2-5 years,https://example.com/jobs/5,data scientist,sample,2026-08-23,"A/B Testing, Machine Learning, Python, SQL, Statistics"

@@ -11,6 +11,7 @@ venv/
 data/raw/*
 !data/raw/.gitkeep
 data/processed/*.csv
+data/*.db
 
 # Jupyter
 .ipynb_checkpoints/

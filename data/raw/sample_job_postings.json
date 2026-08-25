@@ -1,0 +1,57 @@
+[
+  {
+    "title": "Data Analyst",
+    "company": "Acme Analytics",
+    "location": "Bengaluru",
+    "experience": "0-2 years",
+    "skills": ["SQL", "Excel", "Python", "Tableau", "Statistics"],
+    "job_url": "https://example.com/jobs/1",
+    "description": "Looking for a Data Analyst skilled in SQL, Excel, Python and Tableau. Strong statistics fundamentals required.",
+    "search_role": "data analyst",
+    "source": "sample"
+  },
+  {
+    "title": "Business Intelligence Analyst",
+    "company": "BrightMetrics",
+    "location": "Hyderabad",
+    "experience": "1-3 years",
+    "skills": ["SQL", "Power BI", "Excel", "DAX"],
+    "job_url": "https://example.com/jobs/2",
+    "description": "BI Analyst role requiring strong SQL and Power BI dashboarding experience.",
+    "search_role": "data analyst",
+    "source": "sample"
+  },
+  {
+    "title": "Data Analyst",
+    "company": "Northwind Retail",
+    "location": "Remote",
+    "experience": "0-1 years",
+    "skills": ["SQL", "Python", "Power BI", "A/B Testing"],
+    "job_url": "https://example.com/jobs/3",
+    "description": "Entry-level Data Analyst with SQL, Python, Power BI and A/B testing exposure.",
+    "search_role": "data analyst",
+    "source": "sample"
+  },
+  {
+    "title": "Business Analyst",
+    "company": "Vertex Solutions",
+    "location": "Pune",
+    "experience": "2-4 years",
+    "skills": ["SQL", "Excel", "Power BI", "Statistics", "Communication"],
+    "job_url": "https://example.com/jobs/4",
+    "description": "Business Analyst combining SQL, Excel, Power BI and statistical analysis.",
+    "search_role": "business analyst",
+    "source": "sample"
+  },
+  {
+    "title": "Data Scientist",
+    "company": "Quantico Labs",
+    "location": "Bengaluru",
+    "experience": "2-5 years",
+    "skills": ["Python", "Machine Learning", "SQL", "Statistics", "A/B Testing"],
+    "job_url": "https://example.com/jobs/5",
+    "description": "Data Scientist role focused on ML models, SQL, and experimentation.",
+    "search_role": "data scientist",
+    "source": "sample"
+  }
+]
