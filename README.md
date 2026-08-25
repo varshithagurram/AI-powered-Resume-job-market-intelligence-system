@@ -85,6 +85,23 @@ or the sample data) and:
 python scripts/clean_data.py --input data/raw/sample_job_postings.json
 ```
 
+## Database
+
+`sql/schema.sql` defines a normalized SQLite schema:
+- `jobs` — one row per posting, includes `scraped_date` for trend tracking
+- `skills` — distinct skill names
+- `job_skills` — many-to-many link between jobs and skills
+
+`scripts/load_to_sql.py` creates the database (if needed) and loads a
+cleaned CSV into it:
+
+```bash
+python scripts/load_to_sql.py --input data/processed/cleaned_job_postings.csv
+```
+
+This produces `data/job_market.db`, which SQL analysis queries (Day 5) and
+Power BI (Day 10) will both read from.
+
 ## Status
 🚧 In progress — building incrementally. See commit history for day-by-day
 progress.
@@ -92,7 +109,7 @@ progress.
 ## Roadmap
 - [x] Data collection (job postings scraper)
 - [x] Data cleaning and skill extraction
-- [ ] SQL database design and loading
+- [x] SQL database design and loading
 - [ ] SQL trend/demand queries
 - [ ] Resume parser
 - [ ] Matching engine (embeddings-based)
