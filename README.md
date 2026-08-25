@@ -102,6 +102,20 @@ python scripts/load_to_sql.py --input data/processed/cleaned_job_postings.csv
 This produces `data/job_market.db`, which SQL analysis queries (Day 5) and
 Power BI (Day 10) will both read from.
 
+## Analysis Queries
+
+`sql/analysis_queries.sql` contains the SQL that powers the core insights:
+- Most in-demand skills overall and per target role
+- Skill demand trend over time (grouped by `scraped_date`)
+- Skill co-occurrence (which skills commonly appear together in the same posting)
+- Salary ranges by role/location (template query — activates once real
+  scraped data includes salary fields)
+- Which roles most value a given skill
+
+Run these directly against `data/job_market.db` with any SQLite client, or
+via Python (`sqlite3` / `pandas.read_sql`). These same queries will back
+the Power BI dashboard (Day 10).
+
 ## Status
 🚧 In progress — building incrementally. See commit history for day-by-day
 progress.
@@ -110,7 +124,7 @@ progress.
 - [x] Data collection (job postings scraper)
 - [x] Data cleaning and skill extraction
 - [x] SQL database design and loading
-- [ ] SQL trend/demand queries
+- [x] SQL trend/demand queries
 - [ ] Resume parser
 - [ ] Matching engine (embeddings-based)
 - [ ] Multi-role matching and recommendations
