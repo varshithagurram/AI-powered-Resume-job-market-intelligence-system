@@ -116,6 +116,24 @@ Run these directly against `data/job_market.db` with any SQLite client, or
 via Python (`sqlite3` / `pandas.read_sql`). These same queries will back
 the Power BI dashboard (Day 10).
 
+## Resume Parsing
+
+`scripts/parse_resume.py` extracts structured data from a candidate's
+resume (PDF or DOCX):
+- Candidate name (via spaCy PERSON entity recognition)
+- Years of experience (regex pattern matching)
+- Skills — uses the **same skill taxonomy** as `clean_data.py`, so resume
+  skills and job posting skills are extracted identically and can be
+  directly compared in the matching engine (Day 7)
+
+```bash
+python scripts/parse_resume.py --input path/to/resume.pdf
+python scripts/parse_resume.py --input path/to/resume.docx --out data/sample_resumes/parsed.json
+```
+
+`data/sample_resumes/sample_resume.docx` is a hand-written test resume used
+to verify the parser end-to-end.
+
 ## Status
 🚧 In progress — building incrementally. See commit history for day-by-day
 progress.
@@ -125,7 +143,7 @@ progress.
 - [x] Data cleaning and skill extraction
 - [x] SQL database design and loading
 - [x] SQL trend/demand queries
-- [ ] Resume parser
+- [x] Resume parser
 - [ ] Matching engine (embeddings-based)
 - [ ] Multi-role matching and recommendations
 - [ ] Streamlit app
