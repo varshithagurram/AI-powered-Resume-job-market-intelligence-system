@@ -1,0 +1,15 @@
+{
+  "file_name": "sample_resume.docx",
+  "name": "Varshitha Reddy",
+  "years_experience": 2.0,
+  "skills": [
+    "A/B Testing",
+    "Excel",
+    "Machine Learning",
+    "Python",
+    "SQL",
+    "Statistics",
+    "Tableau"
+  ],
+  "raw_text_length": 444
+}
