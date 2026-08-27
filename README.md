@@ -134,6 +134,35 @@ python scripts/parse_resume.py --input path/to/resume.docx --out data/sample_res
 `data/sample_resumes/sample_resume.docx` is a hand-written test resume used
 to verify the parser end-to-end.
 
+## Matching Engine
+
+`scripts/match_engine.py` compares a parsed resume against a target role's
+aggregated skill profile (built from all postings collected under that
+`search_role` in the database) and returns:
+- An overall **match score** (0-100%), blending semantic text similarity
+  with the skills-overlap ratio
+- **Strong skills** — present in both resume and role
+- **Missing skills** — required by the role, absent from the resume
+
+Two similarity backends:
+- `embeddings` (default) — Sentence-BERT (`all-MiniLM-L6-v2`) cosine
+  similarity. Captures semantic matches beyond exact keyword overlap.
+  Requires internet access to download the model on first run — run
+  locally, not from a restricted sandbox.
+- `tfidf` — scikit-learn TF-IDF + cosine similarity. Fully offline, used
+  as a fast baseline/comparison.
+
+```bash
+python scripts/match_engine.py --resume data/sample_resumes/parsed_sample_resume.json --role "data analyst" --backend embeddings
+python scripts/match_engine.py --resume data/sample_resumes/parsed_sample_resume.json --role "data analyst" --backend tfidf
+```
+
+**Note on sample data:** with only a handful of sample postings per role,
+per-role match scores can look skewed (e.g. a role with just 1 posting
+can hit 100% skill overlap by chance). This is a small-sample artifact,
+not a bug in the matching logic — it self-corrects once real scraped/Kaggle
+data with many postings per role is loaded.
+
 ## Status
 🚧 In progress — building incrementally. See commit history for day-by-day
 progress.
@@ -144,7 +173,7 @@ progress.
 - [x] SQL database design and loading
 - [x] SQL trend/demand queries
 - [x] Resume parser
-- [ ] Matching engine (embeddings-based)
+- [x] Matching engine (embeddings-based)
 - [ ] Multi-role matching and recommendations
 - [ ] Streamlit app
 - [ ] Power BI dashboard
