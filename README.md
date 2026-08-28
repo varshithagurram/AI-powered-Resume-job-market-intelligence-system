@@ -163,6 +163,25 @@ can hit 100% skill overlap by chance). This is a small-sample artifact,
 not a bug in the matching logic — it self-corrects once real scraped/Kaggle
 data with many postings per role is loaded.
 
+## Multi-Role Matching & Recommendations
+
+`scripts/multi_role_match.py` runs the matching engine against **every**
+role available in the database (not just one), producing:
+- A **ranked list of match %** across roles (e.g. Data Analyst 82%, BI
+  Analyst 76%, Business Analyst 68%, Data Scientist 43% — matching the
+  target output described in the original project notes)
+- A single **recommended next skill** — the missing skill that appears
+  most often across the candidate's top 3 best-matching roles, so it's the
+  one skill that would move the needle the most
+
+```bash
+python scripts/multi_role_match.py --resume data/sample_resumes/parsed_sample_resume.json --backend tfidf
+```
+
+Verified against the sample resume: correctly recommends **Power BI** as
+the next skill to learn, since it's missing from 2 of the top 3 matched
+roles — consistent with the target example in the project notes.
+
 ## Status
 🚧 In progress — building incrementally. See commit history for day-by-day
 progress.
@@ -174,7 +193,7 @@ progress.
 - [x] SQL trend/demand queries
 - [x] Resume parser
 - [x] Matching engine (embeddings-based)
-- [ ] Multi-role matching and recommendations
+- [x] Multi-role matching and recommendations
 - [ ] Streamlit app
 - [ ] Power BI dashboard
 - [ ] Final polish and deployment
