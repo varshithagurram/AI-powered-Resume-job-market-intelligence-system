@@ -182,6 +182,23 @@ Verified against the sample resume: correctly recommends **Power BI** as
 the next skill to learn, since it's missing from 2 of the top 3 matched
 roles — consistent with the target example in the project notes.
 
+## Streamlit App
+
+`streamlit_app/app.py` is the interactive front end tying the whole
+pipeline together:
+1. Upload a resume (PDF/DOCX)
+2. Pick a target role from a dropdown (populated from the database)
+3. See: overall match score, strong/missing skills, a recommended next
+   skill, and a bar chart of match % across every role in the database
+
+```bash
+streamlit run streamlit_app/app.py
+```
+(run from the project root so the database path and script imports resolve)
+
+Verified: the app starts cleanly and serves without errors against the
+real SQLite database and sample resume.
+
 ## Status
 🚧 In progress — building incrementally. See commit history for day-by-day
 progress.
@@ -194,6 +211,6 @@ progress.
 - [x] Resume parser
 - [x] Matching engine (embeddings-based)
 - [x] Multi-role matching and recommendations
-- [ ] Streamlit app
+- [x] Streamlit app
 - [ ] Power BI dashboard
 - [ ] Final polish and deployment
