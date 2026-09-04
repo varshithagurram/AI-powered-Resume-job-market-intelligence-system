@@ -42,6 +42,25 @@ resume-job-market-intelligence/
 └── README.md
 ```
 
+## Setup
+
+```bash
+pip install -r requirements.txt
+python -m spacy download en_core_web_sm
+```
+
+**Note:** `numpy<2` is pinned in requirements.txt because spaCy's compiled
+dependencies (thinc/blis) AND scikit-learn/scipy's compiled extensions
+both require numpy 1.x — installing numpy 2.x alongside them causes
+`ValueError`/`AttributeError` errors about binary incompatibility. If you
+ever see one of these errors, run:
+```bash
+pip uninstall spacy thinc blis scikit-learn scipy numpy -y
+pip install "numpy<2"
+pip install spacy "scikit-learn<1.5" "scipy<1.13"
+python -m spacy download en_core_web_sm
+```
+
 ## Data Collection
 
 Two data sources are supported, producing the same normalized schema
@@ -71,8 +90,17 @@ data is available.
 
 ## Data Cleaning & Skill Extraction
 
+`scripts/skill_taxonomy.py` is the **shared skill taxonomy** used by both
+`clean_data.py` (job postings) and `parse_resume.py` (resumes) — one
+source of truth so skills are extracted identically from both sides and
+stay directly comparable in the matching engine. Now covers ~90 skills
+across: data/analytics, cloud/infra, software engineering, product/design,
+finance/accounting, QA/testing, marketing, sales, HR, operations/supply
+chain, project management, cybersecurity, mobile development, networking/IT
+support, and general soft skills.
+
 `scripts/clean_data.py` takes any raw JSON postings file (scraped, Kaggle,
-or the sample data) and:
+API, or the sample data) and:
 - Extracts skills from the job title + description using a regex-based
   skill taxonomy (`SKILL_TAXONOMY` in the script — extend this list as new
   skills show up in real data)
@@ -198,6 +226,39 @@ streamlit run streamlit_app/app.py
 
 Verified: the app starts cleanly and serves without errors against the
 real SQLite database and sample resume.
+
+## Live Job Data (Adzuna API)
+
+`scripts/fetch_adzuna_jobs.py` is the **primary** live data source — it
+calls the [Adzuna API](https://developer.adzuna.com/) (free tier, 5,000
+calls/month) to fetch real, current job postings across multiple target
+roles at once. This is more reliable than scraping, since it's a
+legitimate API rather than something anti-bot protection can block.
+
+Setup (one-time, free):
+1. Sign up at https://developer.adzuna.com/ and grab your `app_id` and `app_key`
+2. Set them as environment variables:
+   ```powershell
+   $env:ADZUNA_APP_ID="your_id"
+   $env:ADZUNA_APP_KEY="your_key"
+   ```
+
+```bash
+# Uses the built-in default list of 34 roles across data/analytics, general
+# tech, marketing/sales, HR, and operations/project management:
+python scripts/fetch_adzuna_jobs.py
+
+# Or specify your own custom role list instead:
+python scripts/fetch_adzuna_jobs.py --roles "data analyst" "growth analyst" "operations analyst"
+```
+
+This saves a dated JSON file to `data/raw/` (e.g. `adzuna_jobs_2026-08-29.json`)
+covering all requested roles in one run — feed this straight into
+`clean_data.py` next. Verified connectivity to Adzuna's servers; the
+script needs real credentials to pull live data (see setup above).
+
+`scripts/scrape_naukri.py` remains available as a **backup** if you want
+to supplement with Naukri-specific listings.
 
 ## Status
 🚧 In progress — building incrementally. See commit history for day-by-day

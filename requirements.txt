@@ -5,7 +5,7 @@ selenium
 
 # Data handling
 pandas
-numpy
+numpy<2   # pinned: spacy/thinc's compiled extensions require numpy 1.x
 
 # Resume parsing
 pdfplumber
@@ -13,10 +13,13 @@ python-docx
 docx2txt
 
 # NLP / matching
+# Install spacy first, then run: python -m spacy download en_core_web_sm
+# (don't pin the model wheel URL -- it must match whatever spacy version
+# pip resolves, which can drift; the spacy downloader handles this automatically)
 spacy
-en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl
 sentence-transformers
-scikit-learn
+scikit-learn<1.5
+scipy<1.13
 
 # Database
 sqlalchemy
