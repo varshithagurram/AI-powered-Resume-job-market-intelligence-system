@@ -16,46 +16,12 @@ Usage:
 
 import argparse
 import json
-import re
 from datetime import date
 from pathlib import Path
 
 import pandas as pd
 
-# Skill taxonomy: canonical skill name -> list of text patterns that indicate it.
-# Extend this list as you see new skills show up in real scraped data.
-SKILL_TAXONOMY = {
-    "SQL": [r"\bsql\b"],
-    "Python": [r"\bpython\b"],
-    "Excel": [r"\bexcel\b"],
-    "Tableau": [r"\btableau\b"],
-    "Power BI": [r"\bpower\s*bi\b"],
-    "Statistics": [r"\bstatistic(s)?\b", r"\bstats\b"],
-    "A/B Testing": [r"\ba/?b\s*testing\b"],
-    "Machine Learning": [r"\bmachine\s*learning\b", r"\bml\b"],
-    "DAX": [r"\bdax\b"],
-    "R": [r"\br programming\b", r"\br\b(?=.*(statist|analy))"],
-    "Communication": [r"\bcommunication\b"],
-    "Deep Learning": [r"\bdeep\s*learning\b"],
-    "NLP": [r"\bnlp\b", r"\bnatural language processing\b"],
-    "Spark": [r"\bspark\b"],
-    "AWS": [r"\baws\b"],
-    "Azure": [r"\bazure\b"],
-}
-
-
-def extract_skills(text: str) -> list[str]:
-    """Find canonical skill names mentioned in a block of text."""
-    if not isinstance(text, str):
-        return []
-    text_lower = text.lower()
-    found = []
-    for skill, patterns in SKILL_TAXONOMY.items():
-        for pattern in patterns:
-            if re.search(pattern, text_lower):
-                found.append(skill)
-                break
-    return found
+from skill_taxonomy import extract_skills
 
 
 def clean_record(record: dict, run_date: str) -> dict:
