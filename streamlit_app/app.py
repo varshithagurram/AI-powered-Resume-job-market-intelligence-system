@@ -1,34 +1,73 @@
 """
 streamlit_app/app.py
 
-Interactive front end for the Resume-Job Market Intelligence System.
-
-User flow:
-  1. Upload a resume (PDF or DOCX)
-  2. Pick a target role
-  3. See: overall match score, strong skills, missing skills, most
-     in-demand skills in current listings, recommended next skill, and
-     match % across all available roles
+Interactive front end for the Resume-Job Market Intelligence System, with
+automatic daily data refresh: on each load, the app checks whether today's
+job posting data already exists (via the `scraped_date` stored on every
+job) and automatically re-fetches from the Adzuna API if it's missing or
+stale -- no manual script-running needed once deployed.
 
 Run with:
     streamlit run streamlit_app/app.py
-(run from the project root so the relative imports/db path resolve)
+(run from the project root so relative imports and the database path resolve)
+
+For deployment (e.g. Streamlit Community Cloud): set ADZUNA_APP_ID and
+ADZUNA_APP_KEY in the app's Secrets (Settings -> Secrets), not as plain
+environment variables -- st.secrets is how Streamlit Cloud injects them.
 """
 
+import os
 import sys
 import tempfile
 from pathlib import Path
 
 import streamlit as st
 
-# Allow importing sibling scripts (parse_resume, match_engine, multi_role_match)
 sys.path.append(str(Path(__file__).resolve().parent.parent / "scripts"))
 
 from parse_resume import parse_resume  # noqa: E402
-from match_engine import DB_PATH, get_role_profile  # noqa: E402
+from match_engine import DB_PATH  # noqa: E402
 from multi_role_match import get_all_roles, match_all_roles  # noqa: E402
+from refresh_pipeline import ensure_fresh_data  # noqa: E402
 
 st.set_page_config(page_title="Resume-Job Market Intelligence", layout="wide")
+
+
+def get_adzuna_credentials():
+    """Checks Streamlit secrets first (for deployment), then falls back to
+    environment variables (for local development)."""
+    app_id = st.secrets.get("ADZUNA_APP_ID") if hasattr(st, "secrets") else None
+    app_key = st.secrets.get("ADZUNA_APP_KEY") if hasattr(st, "secrets") else None
+    app_id = app_id or os.environ.get("ADZUNA_APP_ID")
+    app_key = app_key or os.environ.get("ADZUNA_APP_KEY")
+    return app_id, app_key
+
+
+# --- Automatic daily data refresh (runs once per day, shared across all
+# users of a deployed instance -- see refresh_pipeline.is_data_stale, which
+# checks the database's own scraped_date rather than relying on an
+# in-memory cache that wouldn't survive an app restart) ---
+app_id, app_key = get_adzuna_credentials()
+with st.spinner("Checking for fresh job market data..."):
+    refresh_result = ensure_fresh_data(app_id, app_key)
+
+if refresh_result["status"] == "refreshed":
+    st.toast(
+        f"Refreshed job market data: {refresh_result['postings_loaded']} "
+        f"postings loaded for today.",
+        icon="✅",
+    )
+elif refresh_result["status"] == "stale_no_credentials":
+    st.warning(
+        "Job market data hasn't been refreshed today (no Adzuna API "
+        "credentials configured), so results reflect the most recent "
+        "available data instead of today's live postings."
+    )
+elif refresh_result["status"] == "error":
+    st.warning(
+        f"Couldn't refresh job market data today ({refresh_result['reason']}). "
+        "Showing the most recent available data instead."
+    )
 
 st.title("📊 Resume-Job Market Intelligence System")
 st.caption(
@@ -50,8 +89,8 @@ with st.sidebar:
     )
     st.markdown("---")
     st.caption(
-        "Data source: SQLite database built from scraped/Kaggle job postings. "
-        "Run the pipeline scripts (see README) to refresh it."
+        "Job posting data refreshes automatically once per day from the "
+        "Adzuna API. No manual steps needed."
     )
 
 uploaded_file = st.file_uploader("Upload your resume", type=["pdf", "docx"])
@@ -63,8 +102,8 @@ except Exception:
 
 if not available_roles:
     st.warning(
-        "No roles found in the database. Run the data pipeline first "
-        "(scrape/clean/load — see README) before using this app."
+        "No roles found in the database yet. If this is a fresh deployment, "
+        "make sure ADZUNA_APP_ID and ADZUNA_APP_KEY are set in Secrets."
     )
     st.stop()
 
@@ -74,7 +113,6 @@ analyze_clicked = st.button("Analyze match", type="primary", disabled=uploaded_f
 
 if analyze_clicked and uploaded_file is not None:
     with st.spinner("Parsing resume and computing match..."):
-        # parse_resume() expects a file path, so write the upload to a temp file
         suffix = Path(uploaded_file.name).suffix
         with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
             tmp.write(uploaded_file.getvalue())
@@ -96,7 +134,6 @@ if analyze_clicked and uploaded_file is not None:
 
     st.success(f"Analysis complete for **{resume.get('name') or 'candidate'}**")
 
-    # --- Primary match score for the selected target role ---
     target_result = next(
         (r for r in result["ranked_matches"] if r["role"] == target_role), None
     )
@@ -126,7 +163,6 @@ if analyze_clicked and uploaded_file is not None:
     else:
         st.warning(f"No data available for role '{target_role}'.")
 
-    # --- Recommended next skill ---
     if result["recommended_next_skill"]:
         rec = result["recommended_next_skill"]
         st.info(
@@ -136,11 +172,8 @@ if analyze_clicked and uploaded_file is not None:
     else:
         st.info("No skill gaps found across your top-matching roles — nice work!")
 
-    # --- Match % across all roles ---
     st.subheader("Match % across all roles")
-    chart_data = {
-        r["role"]: r["match_score_pct"] for r in result["ranked_matches"]
-    }
+    chart_data = {r["role"]: r["match_score_pct"] for r in result["ranked_matches"]}
     st.bar_chart(chart_data)
 
     with st.expander("See full ranked match details"):
