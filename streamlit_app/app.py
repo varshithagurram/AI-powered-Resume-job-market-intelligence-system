@@ -35,9 +35,18 @@ st.set_page_config(page_title="Resume-Job Market Intelligence", layout="wide")
 
 def get_adzuna_credentials():
     """Checks Streamlit secrets first (for deployment), then falls back to
-    environment variables (for local development)."""
-    app_id = st.secrets.get("ADZUNA_APP_ID") if hasattr(st, "secrets") else None
-    app_key = st.secrets.get("ADZUNA_APP_KEY") if hasattr(st, "secrets") else None
+    environment variables (for local development). Accessing st.secrets at
+    all raises an error if no secrets.toml exists anywhere -- even with
+    .get() -- so this is wrapped in a try/except rather than a hasattr check.
+    """
+    app_id = None
+    app_key = None
+    try:
+        app_id = st.secrets.get("ADZUNA_APP_ID")
+        app_key = st.secrets.get("ADZUNA_APP_KEY")
+    except Exception:
+        pass  # no secrets.toml configured -- fall through to env vars
+
     app_id = app_id or os.environ.get("ADZUNA_APP_ID")
     app_key = app_key or os.environ.get("ADZUNA_APP_KEY")
     return app_id, app_key
